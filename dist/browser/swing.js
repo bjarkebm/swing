@@ -573,7 +573,7 @@
 	      while(this._idleSpringIndices.length > 0) this._idleSpringIndices.pop();
 	      for (var i = 0, len = this._activeSprings.length; i < len; i++) {
 	        var spring = this._activeSprings[i];
-	        if (spring.systemShouldAdvance()) {
+	        if (spring && spring.systemShouldAdvance()) {
 	          spring.advance(time / 1000.0, deltaTime / 1000.0);
 	        } else {
 	          this._idleSpringIndices.push(this._activeSprings.indexOf(spring));
