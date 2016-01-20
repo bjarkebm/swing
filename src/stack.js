@@ -16,6 +16,18 @@ Stack = (config) => {
         springSystem,
         stack;
 
+    const eventNames = [
+        'throwout',
+        'throwoutend',
+        'throwoutleft',
+        'throwoutright',
+        'throwin',
+        'throwinend',
+        'dragstart',
+        'dragmove',
+        'dragend'
+    ];
+
     construct = () => {
         stack = {};
         springSystem = new rebound.SpringSystem();
@@ -58,32 +70,22 @@ Stack = (config) => {
      */
     stack.createCard = (element) => {
         let card,
-            events;
+            listeners;
 
+        listeners = [];
         card = Card(stack, element);
 
-        events = [
-            'throwout',
-            'throwoutend',
-            'throwoutleft',
-            'throwoutright',
-            'throwin',
-            'throwinend',
-            'dragstart',
-            'dragmove',
-            'dragend'
-        ];
-
         // Proxy Card events to the Stack.
-        events.forEach((eventName) => {
-            card.on(eventName, (data) => {
+        eventNames.forEach((eventName) => {
+            listeners.push(card.on(eventName, (data) => {
                 eventEmitter.trigger(eventName, data);
-            });
+            }));
         });
 
         index.push({
             element,
-            card
+            card,
+            listeners
         });
 
         return card;
@@ -116,15 +118,24 @@ Stack = (config) => {
      * @return {Card}
      */
     stack.destroyCard = (card) => {
-        let removedCard;
+        let removedCard,
+            removedCards;
 
-        removedCard = util.remove(index, {card});
+        removedCards = util.remove(index, {
+            card
+        });
 
-        if (removedCard) {
-            return removedCard.card;
+        if (!removedCards || !removedCards.length) {
+            return null;
         }
 
-        return null;
+        removedCard = removedCards[0];
+
+        removedCard.listeners.forEach((listener) => {
+            removedCard.card.off(listener);
+        });
+
+        return removedCard.card;
     };
 
     return stack;

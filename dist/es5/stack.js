@@ -35,6 +35,8 @@ Stack = function (config) {
         springSystem = undefined,
         stack = undefined;
 
+    var eventNames = ['throwout', 'throwoutend', 'throwoutleft', 'throwoutright', 'throwin', 'throwinend', 'dragstart', 'dragmove', 'dragend'];
+
     construct = function () {
         stack = {};
         springSystem = new _rebound2['default'].SpringSystem();
@@ -81,22 +83,22 @@ Stack = function (config) {
      */
     stack.createCard = function (element) {
         var card = undefined,
-            events = undefined;
+            listeners = undefined;
 
+        listeners = [];
         card = (0, _card2['default'])(stack, element);
 
-        events = ['throwout', 'throwoutend', 'throwoutleft', 'throwoutright', 'throwin', 'throwinend', 'dragstart', 'dragmove', 'dragend'];
-
         // Proxy Card events to the Stack.
-        events.forEach(function (eventName) {
-            card.on(eventName, function (data) {
+        eventNames.forEach(function (eventName) {
+            listeners.push(card.on(eventName, function (data) {
                 eventEmitter.trigger(eventName, data);
-            });
+            }));
         });
 
         index.push({
             element: element,
-            card: card
+            card: card,
+            listeners: listeners
         });
 
         return card;
@@ -129,15 +131,24 @@ Stack = function (config) {
      * @return {Card}
      */
     stack.destroyCard = function (card) {
-        var removedCard = undefined;
+        var removedCard = undefined,
+            removedCards = undefined;
 
-        removedCard = _util2['default'].remove(index, { card: card });
+        removedCards = _util2['default'].remove(index, {
+            card: card
+        });
 
-        if (removedCard) {
-            return removedCard.card;
+        if (!removedCards) {
+            return null;
         }
 
-        return null;
+        removedCard = removedCards[0];
+
+        removedCard.listeners.forEach(function (listener) {
+            removedCard.card.off(listener);
+        });
+
+        return removedCard.card;
     };
 
     return stack;

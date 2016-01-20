@@ -289,6 +289,7 @@ Card = (stack, targetElement) => {
      * Alias
      */
     card.on = eventEmitter.on;
+    card.off = eventEmitter.off;
     card.trigger = eventEmitter.trigger;
 
     /**

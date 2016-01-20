@@ -112,6 +112,8 @@
 	        springSystem = undefined,
 	        stack = undefined;
 	
+	    var eventNames = ['throwout', 'throwoutend', 'throwoutleft', 'throwoutright', 'throwin', 'throwinend', 'dragstart', 'dragmove', 'dragend'];
+	
 	    construct = function () {
 	        stack = {};
 	        springSystem = new _rebound2['default'].SpringSystem();
@@ -158,22 +160,22 @@
 	     */
 	    stack.createCard = function (element) {
 	        var card = undefined,
-	            events = undefined;
+	            listeners = undefined;
 	
+	        listeners = [];
 	        card = (0, _card2['default'])(stack, element);
 	
-	        events = ['throwout', 'throwoutend', 'throwoutleft', 'throwoutright', 'throwin', 'throwinend', 'dragstart', 'dragmove', 'dragend'];
-	
 	        // Proxy Card events to the Stack.
-	        events.forEach(function (eventName) {
-	            card.on(eventName, function (data) {
+	        eventNames.forEach(function (eventName) {
+	            listeners.push(card.on(eventName, function (data) {
 	                eventEmitter.trigger(eventName, data);
-	            });
+	            }));
 	        });
 	
 	        index.push({
 	            element: element,
-	            card: card
+	            card: card,
+	            listeners: listeners
 	        });
 	
 	        return card;
@@ -206,15 +208,24 @@
 	     * @return {Card}
 	     */
 	    stack.destroyCard = function (card) {
-	        var removedCard = undefined;
+	        var removedCard = undefined,
+	            removedCards = undefined;
 	
-	        removedCard = _util2['default'].remove(index, { card: card });
+	        removedCards = _util2['default'].remove(index, {
+	            card: card
+	        });
 	
-	        if (removedCard) {
-	            return removedCard.card;
+	        if (!removedCards) {
+	            return null;
 	        }
 	
-	        return null;
+	        removedCard = removedCards[0];
+	
+	        removedCard.listeners.forEach(function (listener) {
+	            removedCard.card.off(listener);
+	        });
+	
+	        return removedCard.card;
 	    };
 	
 	    return stack;
@@ -562,7 +573,7 @@
 	      while(this._idleSpringIndices.length > 0) this._idleSpringIndices.pop();
 	      for (var i = 0, len = this._activeSprings.length; i < len; i++) {
 	        var spring = this._activeSprings[i];
-	        if (spring && spring.systemShouldAdvance()) {
+	        if (spring.systemShouldAdvance()) {
 	          spring.advance(time / 1000.0, deltaTime / 1000.0);
 	        } else {
 	          this._idleSpringIndices.push(this._activeSprings.indexOf(spring));
@@ -1942,6 +1953,7 @@
 	     * Alias
 	     */
 	    card.on = eventEmitter.on;
+	    card.off = eventEmitter.off;
 	    card.trigger = eventEmitter.trigger;
 	
 	    /**
