@@ -228,10 +228,6 @@
                 "beforeLineComment": true
             }
         ],
-        "linebreak-style": [
-            2,
-            "unix"
-        ],
         "max-nested-callbacks": [
             1,
             3
