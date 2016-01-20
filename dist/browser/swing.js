@@ -1696,8 +1696,8 @@
 	        config = Card.makeConfig(stack.getConfig());
 	        eventEmitter = (0, _sister2['default'])();
 	        springSystem = stack.getSpringSystem();
-	        springThrowIn = springSystem.createSpring(250, 10);
-	        springThrowOut = springSystem.createSpring(500, 20);
+	        springThrowIn = springSystem.createSpring(250, 25);
+	        springThrowOut = springSystem.createSpring(500, 50);
 	        lastThrow = {};
 	        lastTranslate = {
 	            x: 0,
@@ -1896,22 +1896,23 @@
 	         * @param {Card.THROW_IN|Card.THROW_OUT} where
 	         * @param {Number} fromX
 	         * @param {Number} fromY
+	         * @param {Number} velocity
 	         * @return {undefined}
 	         */
-	        throwWhere = function (where, fromX, fromY) {
+	        throwWhere = function (where, fromX, fromY, velocity) {
 	            lastThrow.fromX = fromX;
 	            lastThrow.fromY = fromY;
 	            lastThrow.direction = lastThrow.fromX < 0 ? Card.DIRECTION_LEFT : Card.DIRECTION_RIGHT;
 	
 	            if (where === Card.THROW_IN) {
-	                springThrowIn.setCurrentValue(0).setAtRest().setEndValue(1);
+	                springThrowIn.setCurrentValue(0).setAtRest().setVelocity(velocity || 0.3).setEndValue(1);
 	
 	                eventEmitter.trigger('throwin', {
 	                    target: targetElement,
 	                    throwDirection: lastThrow.direction
 	                });
 	            } else if (where === Card.THROW_OUT) {
-	                springThrowOut.setCurrentValue(0).setAtRest().setVelocity(100).setEndValue(1);
+	                springThrowOut.setCurrentValue(0).setAtRest().setVelocity(velocity || 100).setEndValue(1);
 	
 	                eventEmitter.trigger('throwout', {
 	                    target: targetElement,
@@ -1948,10 +1949,11 @@
 	     *
 	     * @param {Number} fromX
 	     * @param {Number} fromY
+	     * @param {Number} velocity
 	     * @return {undefined}
 	     */
-	    card.throwIn = function (fromX, fromY) {
-	        throwWhere(Card.THROW_IN, fromX, fromY);
+	    card.throwIn = function (fromX, fromY, velocity) {
+	        throwWhere(Card.THROW_IN, fromX, fromY, velocity);
 	    };
 	
 	    /**
@@ -1959,10 +1961,11 @@
 	     *
 	     * @param {Number} fromX
 	     * @param {Number} fromY
+	     * @param {Number} velocity
 	     * @return {undefined}
 	     */
-	    card.throwOut = function (fromX, fromY) {
-	        throwWhere(Card.THROW_OUT, fromX, fromY);
+	    card.throwOut = function (fromX, fromY, velocity) {
+	        throwWhere(Card.THROW_OUT, fromX, fromY, velocity);
 	    };
 	
 	    /**
