@@ -6,7 +6,6 @@ webpack = require('webpack');
 filename = '[name].js',
 
 plugins = [
-    new webpack.optimize.UglifyJsPlugin({minimize: true}),
     new webpack.OldWatchingPlugin(),
     // new webpack.NewWatchingPlugin(),
     new webpack.optimize.DedupePlugin(),
