@@ -138,7 +138,7 @@ Stack = function (config) {
             card: card
         });
 
-        if (!removedCards) {
+        if (!removedCards || !removedCards.length) {
             return null;
         }
 

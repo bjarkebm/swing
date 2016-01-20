@@ -215,7 +215,7 @@
 	            card: card
 	        });
 	
-	        if (!removedCards) {
+	        if (!removedCards || !removedCards.length) {
 	            return null;
 	        }
 	
@@ -573,7 +573,7 @@
 	      while(this._idleSpringIndices.length > 0) this._idleSpringIndices.pop();
 	      for (var i = 0, len = this._activeSprings.length; i < len; i++) {
 	        var spring = this._activeSprings[i];
-	        if (spring && spring.systemShouldAdvance()) {
+	        if (spring.systemShouldAdvance()) {
 	          spring.advance(time / 1000.0, deltaTime / 1000.0);
 	        } else {
 	          this._idleSpringIndices.push(this._activeSprings.indexOf(spring));
@@ -1642,7 +1642,7 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
@@ -1777,37 +1777,9 @@
 	            });
 	        });
 	
-	        // "mousedown" event fires late on touch enabled devices, thus listening
-	        // to the touchstart event for touch enabled devices and mousedown otherwise.
-	        if (_utilJs2['default'].isTouchDevice()) {
-	            targetElement.addEventListener('touchstart', function () {
-	                eventEmitter.trigger('panstart');
-	            });
-	
-	            // Disable scrolling while dragging the element on the touch enabled devices.
-	            // @see http://stackoverflow.com/a/12090055/368691
-	            (function () {
-	                var dragging = undefined;
-	
-	                targetElement.addEventListener('touchstart', function () {
-	                    dragging = true;
-	                });
-	
-	                targetElement.addEventListener('touchend', function () {
-	                    dragging = false;
-	                });
-	
-	                global.addEventListener('touchmove', function (e) {
-	                    if (dragging) {
-	                        e.preventDefault();
-	                    }
-	                });
-	            })();
-	        } else {
-	            targetElement.addEventListener('mousedown', function () {
-	                eventEmitter.trigger('panstart');
-	            });
-	        }
+	        mc.on('panstart', function (e) {
+	            eventEmitter.trigger('panstart', e);
+	        });
 	
 	        mc.on('panmove', function (e) {
 	            eventEmitter.trigger('panmove', e);
@@ -2131,7 +2103,6 @@
 	
 	exports['default'] = Card;
 	module.exports = exports['default'];
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 7 */
